@@ -6,14 +6,13 @@ EXTRAS = -lm
 SHELL_NAME = math_eval
 
 SRCS =  math_eval.c
-SRCS += ast.c ast.h
-SRCS += eval.c eval.h
-SRCS += lexer.c lexer.h
-SRCS += list.c list.h
-SRCS += token.c token.h
+SRCS += ast.c
+SRCS += eval.c
+SRCS += lexer.c
+SRCS += list.c
+SRCS += token.c
 
-
-eval:
+all:
 	$(CC) $(CFLAGS) $(SRCS) -o $(SHELL_NAME) $(EXTRAS)
 
 debug:

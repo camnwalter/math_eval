@@ -1,5 +1,3 @@
-#ifndef MATH_EVAL_EVAL_H
-#define MATH_EVAL_EVAL_H
+#pragma once
 
 void eval(char *);
-#endif //MATH_EVAL_EVAL_H

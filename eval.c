@@ -11,48 +11,45 @@ static void eval_node(struct node *node) {
 
     switch (node->node_type) {
         case INTERNAL:
-            eval_node(node->children[0]);
+            eval_node(node->left);
             if (is_unary_op(node->token)) {
                 switch (node->token) {
                     case U_MINUS:
-                        node->val = -node->children[0]->val;
+                        node->val = -node->left->val;
                         break;
                     default:
                         break;
                 }
             }
             if (is_binary_op(node->token)) {
-                eval_node(node->children[1]);
+                eval_node(node->right);
 
                 switch (node->token) {
                     case PLUS:
-                        node->val = node->children[0]->val + node->children[1]->val;
+                        node->val = node->left->val + node->right->val;
                         break;
                     case MINUS:
-                        node->val = node->children[0]->val - node->children[1]->val;
+                        node->val = node->left->val - node->right->val;
                         break;
                     case MULTIPLY:
-                        node->val = node->children[0]->val * node->children[1]->val;
+                        node->val = node->left->val * node->right->val;
                         break;
                     case DIVIDE:
-                        if (node->children[1]->val != 0) {
-                            node->val = node->children[0]->val / node->children[1]->val;
+                        if (node->right->val != 0) {
+                            node->val = node->left->val / node->right->val;
                         } else {
                             // TODO: handle errors
                         }
                         break;
                     case POWER:
-                        node->val = pow(node->children[0]->val, node->children[1]->val);
+                        node->val = pow(node->left->val, node->right->val);
                         break;
                     default:
                         break;
                 }
             }
-            if (node->token == IDENTITY) {
-                node->val = node->children[0]->val;
-            }
             break;
-        case LEAF:
+        case LEAF: // value is already there, so do nothing
         default:
             break;
     }

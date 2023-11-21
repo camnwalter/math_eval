@@ -7,14 +7,14 @@
 
 static volatile bool running = true;
 
-void handle_signals() {
-    running = false;
+void handle_signals(int signal) {
+    if (signal == SIGINT) {
+        running = false;
+    }
 }
 
 int main() {
-    struct sigaction sig;
-    sig.sa_handler = handle_signals;
-    sigaction(SIGINT, &sig, NULL);
+    signal(SIGINT, handle_signals);
 
     puts("Math Evaluator");
     char input[MAX_INPUT_LENGTH];

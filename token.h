@@ -1,5 +1,4 @@
-#ifndef MATH_EVAL_TOKEN_H
-#define MATH_EVAL_TOKEN_H
+#pragma once
 
 #include "list.h"
 
@@ -22,7 +21,6 @@ enum token_type {
     // unary operators
     U_MINUS,
 
-    IDENTITY,
     EOL,
     INVALID = -1,
 };
@@ -33,6 +31,5 @@ struct token {
 };
 
 enum token_type char_to_type(char);
-char type_to_char(enum token_type);
+char *type_to_string(enum token_type);
 
-#endif //MATH_EVAL_TOKEN_H

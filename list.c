@@ -49,6 +49,10 @@ bool list_add(struct list *list, void *data) {
 }
 
 void *list_get(const struct list *list, size_t index) {
+    if (index >= list_size(list)) {
+        return NULL;
+    }
+
     return list->data[index];
 }
 
@@ -57,6 +61,10 @@ void *list_get(const struct list *list, size_t index) {
  * @return the deleted data
  */
 void *list_remove(struct list *list, size_t index) {
+    if (index >= list_size(list)) {
+        return NULL;
+    }
+
     void *data = list_get(list, index);
     size_t elems_to_shift = list_size(list) - index - 1;
     memmove(&data, &list->data[index + 1], elems_to_shift * sizeof *list->data);

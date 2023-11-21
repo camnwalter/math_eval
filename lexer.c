@@ -4,8 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 
-static char *numbers = ".0123456789";
-
 static void get_number(struct list *tokens, char *input, size_t *pos) {
     char *output;
     char *input_offset = input + *pos;
@@ -39,7 +37,7 @@ struct list *convert_to_tokens(char *input) {
             if (representation == NULL) {
                 break;
             }
-            representation->data = -1;
+            representation->data = 0;
             representation->type = EOL;
 
             list_add(tokens, representation);
@@ -48,7 +46,7 @@ struct list *convert_to_tokens(char *input) {
 
         if (current == ' ' || current == '\t') {
             pos++;
-        } else if (strchr(numbers, current) != NULL) {
+        } else if (strchr(".0123456789", current) != NULL) {
             get_number(tokens, input, &pos);
         } else {
             enum token_type type = char_to_type(current);
@@ -61,7 +59,7 @@ struct list *convert_to_tokens(char *input) {
             if (representation == NULL) {
                 break;
             }
-            representation->data = -1;
+            representation->data = 0;
             representation->type = type;
 
             list_add(tokens, representation);

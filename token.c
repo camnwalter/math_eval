@@ -20,24 +20,25 @@ enum token_type char_to_type(char c) {
             return INVALID;
     }
 }
-char type_to_char(enum token_type type) {
+char *type_to_string(enum token_type type) {
     switch (type) {
         case PLUS:
-            return '+';
+            return "+";
         case MINUS:
-            return '-';
+            return "-";
         case MULTIPLY:
-            return '*';
+            return "*";
         case DIVIDE:
-            return '/';
+            return "/";
         case POWER:
-            return '^';
+            return "^";
         case L_PAREN:
-            return '(';
+            return "(";
         case R_PAREN:
-            return ')';
+            return ")";
         case NUMBER:
+            return "Number";
         default:
-            return '\0';
+            return "Unknown";
     }
 }

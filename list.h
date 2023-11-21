@@ -1,5 +1,4 @@
-#ifndef MATH_EVAL_LIST_H
-#define MATH_EVAL_LIST_H
+#pragma once
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -14,4 +13,3 @@ void list_clear(struct list *);
 void list_free(struct list *);
 size_t list_size(const struct list *);
 
-#endif //MATH_EVAL_LIST_H
