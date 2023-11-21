@@ -9,11 +9,11 @@
 // 4. Addition/Subtraction
 static struct node *parse_primary(const struct list *tokens, size_t *index);
 
+static struct node *parse_exponent(const struct list *tokens, size_t *index);
+
 static struct node *parse_multiply(const struct list *tokens, size_t *index);
 
 static struct node *parse_add(const struct list *tokens, size_t *index);
-
-static struct node *build_ast(const struct list *tokens, size_t *index);
 
 bool is_unary_op(enum token_type type) {
     return type == U_MINUS;
@@ -23,7 +23,7 @@ bool is_binary_op(enum token_type type) {
     return type >= PLUS && type <= POWER;
 }
 
-struct node *create_node(struct token *token) {
+static struct node *create_node(struct token *token) {
     struct node *node = malloc(sizeof *node);
     if (node == NULL) {
         fprintf(stderr, "Memory allocation error\n");
@@ -34,12 +34,29 @@ struct node *create_node(struct token *token) {
     node->val = token->data;
     node->left = NULL;
     node->right = NULL;
+    node->node_type = DEFAULT;
     return node;
 }
 
 static struct node *parse_primary(const struct list *tokens, size_t *index) {
     struct token *current = list_get(tokens, *index);
+    if (current == NULL) {
+        return NULL;
+    }
+
     switch (current->type) {
+        case U_MINUS: {
+            (*index)++;
+            struct node *new_node = create_node(current);
+            new_node->left = parse_add(tokens, index);
+            if (new_node->left == NULL) {
+                puts("Error: - takes 1 or 2 operands, none found.");
+                cleanup(new_node);
+                return NULL;
+            }
+            new_node->node_type = INTERNAL;
+            return new_node;
+        }
         case NUMBER: {
             (*index)++;
             struct node *new_node = create_node(current);
@@ -48,13 +65,18 @@ static struct node *parse_primary(const struct list *tokens, size_t *index) {
         }
         case L_PAREN: {
             (*index)++;
-            struct node *new_node = build_ast(tokens, index);
+            struct node *new_node = parse_add(tokens, index);
             if (((struct token *) list_get(tokens, *index))->type != R_PAREN) {
                 puts("Expected ')'");
                 cleanup(new_node);
                 return NULL;
             }
+            (*index)++;
             return new_node;
+        }
+        case R_PAREN: {
+            puts("Expected token: ')'");
+            return NULL;
         }
         default:
             break;
@@ -63,18 +85,24 @@ static struct node *parse_primary(const struct list *tokens, size_t *index) {
     return NULL;
 }
 
-static struct node *parse_multiply(const struct list *tokens, size_t *index) {
+static struct node *parse_exponent(const struct list *tokens, size_t *index) {
     struct node *left = parse_primary(tokens, index);
 
     struct token *current = list_get(tokens, *index);
-    while (current->type == MULTIPLY || current->type == DIVIDE) {
+    if (current == NULL) {
+        return NULL;
+    }
+    while (current->type == POWER) {
         (*index)++;
+        if (left == NULL) {
+            puts("Error: ^ takes 2 operands, none found.");
+            return NULL;
+        }
 
         struct node *right = parse_primary(tokens, index);
         if (right == NULL) {
-            puts("Error: * and / takes 2 operands, only 1 found.");
+            puts("Error: ^ takes 2 operands, only 1 found.");
             cleanup(left);
-            cleanup(right);
             return NULL;
         }
 
@@ -84,6 +112,45 @@ static struct node *parse_multiply(const struct list *tokens, size_t *index) {
         new_node->node_type = INTERNAL;
 
         current = list_get(tokens, *index);
+        if (current == NULL) {
+            return NULL;
+        }
+        left = new_node;
+    }
+
+    return left;
+}
+
+static struct node *parse_multiply(const struct list *tokens, size_t *index) {
+    struct node *left = parse_exponent(tokens, index);
+
+    struct token *current = list_get(tokens, *index);
+    if (current == NULL) {
+        return NULL;
+    }
+    while (current->type == MULTIPLY || current->type == DIVIDE) {
+        (*index)++;
+        if (left == NULL) {
+            puts("Error: * and / take 2 operands, none found.");
+            return NULL;
+        }
+
+        struct node *right = parse_exponent(tokens, index);
+        if (right == NULL) {
+            puts("Error: * and / take 2 operands, only 1 found.");
+            cleanup(left);
+            return NULL;
+        }
+
+        struct node *new_node = create_node(current);
+        new_node->left = left;
+        new_node->right = right;
+        new_node->node_type = INTERNAL;
+
+        current = list_get(tokens, *index);
+        if (current == NULL) {
+            return NULL;
+        }
         left = new_node;
     }
 
@@ -94,14 +161,20 @@ static struct node *parse_add(const struct list *tokens, size_t *index) {
     struct node *left = parse_multiply(tokens, index);
 
     struct token *current = list_get(tokens, *index);
+    if (current == NULL) {
+        return NULL;
+    }
     while (current->type == PLUS || current->type == MINUS) {
         (*index)++;
+        if (left == NULL) {
+            puts("Error: + and - take 2 operands, none found.");
+            return NULL;
+        }
 
         struct node *right = parse_multiply(tokens, index);
         if (right == NULL) {
-            puts("Error: + and - takes 2 operands, only 1 found.");
+            puts("Error: + and - take 2 operands, only 1 found.");
             cleanup(left);
-            cleanup(right);
             return NULL;
         }
 
@@ -111,28 +184,18 @@ static struct node *parse_add(const struct list *tokens, size_t *index) {
         new_node->node_type = INTERNAL;
 
         current = list_get(tokens, *index);
+        if (current == NULL) {
+            return NULL;
+        }
         left = new_node;
     }
 
     return left;
 }
 
-static struct node *build_ast(const struct list *tokens, size_t *index) {
-    return parse_add(tokens, index);
-}
-
 struct node *parse_root(const struct list *tokens) {
-    /**
-     * 1 + 2 * 3
-     * =>
-     *     +
-     *    / \
-     *   1   *
-     *      / \
-     *     2   3
-     */
     size_t index = 0;
-    struct node *root = build_ast(tokens, &index);
+    struct node *root = parse_add(tokens, &index);
     return root;
 }
 

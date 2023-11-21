@@ -22,3 +22,4 @@ This was written over Thanksgiving Break 2023, so it's not the best :)
 ## Credits
 - [CS429 CI Lab](https://github.com/CS429-S2023/CI-Lab) for some ideas on how to
 set up the AST
+- https://github.com/tlaceby/guide-to-interpreters-series

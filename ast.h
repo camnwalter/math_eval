@@ -6,6 +6,7 @@
 enum node_type {
     LEAF,
     INTERNAL,
+    DEFAULT = -1, // for debugging purposes
 };
 
 struct node {

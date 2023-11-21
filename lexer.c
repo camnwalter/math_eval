@@ -29,6 +29,7 @@ static void get_number(struct list *tokens, char *input, size_t *pos) {
 struct list *convert_to_tokens(char *input) {
     size_t pos = 0;
     struct list *tokens = list_init(0);
+    struct token *prev = NULL;
 
     while (pos < strlen(input)) {
         char current = input[pos];
@@ -55,6 +56,10 @@ struct list *convert_to_tokens(char *input) {
                 break;
             }
 
+            if (type == MINUS && (prev == NULL || prev->type != NUMBER)) {
+                type = U_MINUS;
+            }
+
             struct token *representation = malloc(sizeof *representation);
             if (representation == NULL) {
                 break;
@@ -64,6 +69,7 @@ struct list *convert_to_tokens(char *input) {
 
             list_add(tokens, representation);
             pos++;
+            prev = representation;
         }
     }
 
