@@ -7,13 +7,15 @@ This was written over Thanksgiving Break 2023, so it's not the best :)
 - Addition
 - Subtraction
 - Multiplication
+  - Implicit multiplication is also supported, but doesn't have higher precedence.
 - Division
 - Exponentiation
 - Parentheses
 
-# Potential additional features
-- Implicit multiplication, e.g. 3(2)
+## Potential additional features, in order of how likely I am to do them...
+- Command history via up/down arrows, editing via left & right arrows
 - Variables
+- Trig functions
 
 ## How to build:
 - run `make`, or `make debug` for debugging purposes.
