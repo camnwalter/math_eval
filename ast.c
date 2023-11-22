@@ -89,17 +89,14 @@ static struct node *parse_exponent(const struct list *tokens, size_t *index) {
     struct node *left = parse_primary(tokens, index);
 
     struct token *current = list_get(tokens, *index);
-    if (current == NULL) {
-        return NULL;
-    }
-    while (current->type == POWER) {
+    while (current != NULL && current->type == POWER) {
         (*index)++;
         if (left == NULL) {
             puts("Error: ^ takes 2 operands, none found.");
             return NULL;
         }
 
-        struct node *right = parse_primary(tokens, index);
+        struct node *right = parse_exponent(tokens, index);
         if (right == NULL) {
             puts("Error: ^ takes 2 operands, only 1 found.");
             cleanup(left);
@@ -112,9 +109,6 @@ static struct node *parse_exponent(const struct list *tokens, size_t *index) {
         new_node->node_type = INTERNAL;
 
         current = list_get(tokens, *index);
-        if (current == NULL) {
-            return NULL;
-        }
         left = new_node;
     }
 
@@ -125,10 +119,7 @@ static struct node *parse_multiply(const struct list *tokens, size_t *index) {
     struct node *left = parse_exponent(tokens, index);
 
     struct token *current = list_get(tokens, *index);
-    if (current == NULL) {
-        return NULL;
-    }
-    while (current->type == MULTIPLY || current->type == DIVIDE) {
+    while (current != NULL && (current->type == MULTIPLY || current->type == DIVIDE)) {
         (*index)++;
         if (left == NULL) {
             puts("Error: * and / take 2 operands, none found.");
@@ -148,9 +139,6 @@ static struct node *parse_multiply(const struct list *tokens, size_t *index) {
         new_node->node_type = INTERNAL;
 
         current = list_get(tokens, *index);
-        if (current == NULL) {
-            return NULL;
-        }
         left = new_node;
     }
 
@@ -161,10 +149,7 @@ static struct node *parse_add(const struct list *tokens, size_t *index) {
     struct node *left = parse_multiply(tokens, index);
 
     struct token *current = list_get(tokens, *index);
-    if (current == NULL) {
-        return NULL;
-    }
-    while (current->type == PLUS || current->type == MINUS) {
+    while (current != NULL && (current->type == PLUS || current->type == MINUS)) {
         (*index)++;
         if (left == NULL) {
             puts("Error: + and - take 2 operands, none found.");
@@ -184,9 +169,6 @@ static struct node *parse_add(const struct list *tokens, size_t *index) {
         new_node->node_type = INTERNAL;
 
         current = list_get(tokens, *index);
-        if (current == NULL) {
-            return NULL;
-        }
         left = new_node;
     }
 

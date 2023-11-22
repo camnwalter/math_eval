@@ -4,9 +4,9 @@
 #include <math.h>
 #include <stdio.h>
 
-static void eval_node(struct node *node) {
+static bool eval_node(struct node *node) {
     if (node == NULL) {
-        return;
+        return true;
     }
 
     switch (node->node_type) {
@@ -38,7 +38,8 @@ static void eval_node(struct node *node) {
                         if (node->right->val != 0) {
                             node->val = node->left->val / node->right->val;
                         } else {
-                            // TODO: handle errors
+                            puts("Error: Can't divide by 0");
+                            return false;
                         }
                         break;
                     case POWER:
@@ -53,6 +54,7 @@ static void eval_node(struct node *node) {
         default:
             break;
     }
+    return true;
 }
 
 static void eval_root(struct node *root) {
@@ -60,8 +62,9 @@ static void eval_root(struct node *root) {
         return;
     }
 
-    eval_node(root);
-    printf("%.2f\n", root->val);
+    if (eval_node(root)) {
+        printf("%.2f\n", root->val);
+    }
 }
 
 void eval(char *raw_input) {
