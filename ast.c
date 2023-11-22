@@ -5,8 +5,9 @@
 // ORDER OF OPERATIONS:
 // 1. Parentheses
 // 2. Exponents
-// 3. Multiplication/Division
+// 3. Multiplication/Division. Implicit multiplication is not higher precedence
 // 4. Addition/Subtraction
+
 static struct node *parse_primary(const struct list *tokens, size_t *index);
 
 static struct node *parse_exponent(const struct list *tokens, size_t *index);

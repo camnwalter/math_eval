@@ -18,7 +18,8 @@ static void get_number(struct list *tokens, char *input, size_t *pos) {
 
     struct token *representation = malloc(sizeof *representation);
     if (representation == NULL) {
-        return;
+        fprintf(stderr, "Could not allocate a new number token\n");
+        exit(EXIT_FAILURE);
     }
 
     representation->data = val;
@@ -49,6 +50,7 @@ struct list *convert_to_tokens(char *input) {
             pos++;
         } else if (strchr(".0123456789", current) != NULL) {
             get_number(tokens, input, &pos);
+            prev = list_get(tokens, list_size(tokens) - 1);
         } else {
             enum token_type type = char_to_type(current);
             if (type == INVALID) {
@@ -60,9 +62,22 @@ struct list *convert_to_tokens(char *input) {
                 type = U_MINUS;
             }
 
+            if (type == L_PAREN && prev->type == NUMBER) {
+                struct token *implicit_mult = malloc(sizeof *implicit_mult);
+                if (implicit_mult == NULL) {
+                    fprintf(stderr, "Could not allocate a new token\n");
+                    exit(EXIT_FAILURE);
+                }
+                implicit_mult->type = MULTIPLY;
+                implicit_mult->data = 0;
+                list_add(tokens, implicit_mult);
+                prev = implicit_mult;
+            }
+
             struct token *representation = malloc(sizeof *representation);
             if (representation == NULL) {
-                break;
+                fprintf(stderr, "Could not allocate a new token\n");
+                exit(EXIT_FAILURE);
             }
             representation->data = 0;
             representation->type = type;
