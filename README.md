@@ -13,8 +13,27 @@ This was written over Thanksgiving Break 2023, so it's not the best :)
 - Parentheses
 
 ## Potential additional features, in order of how likely I am to do them...
+- Built-in functions
+  - sin, csc
+  - cos, sec
+  - tan, cot
+
+  - sinh, csch
+  - cosh, sech
+  - tanh, coth
+
+  - arcsin, arccsc
+  - arccos, arcsec
+  - arctan, arccot
+
+  - log (log 10)
+  - log_n
+  - factorial
+  - pi
+  - e
+
 - Variables
-- Trig functions
+
 
 ## How to build:
 - run `make`, or `make debug` for debugging purposes.

@@ -12,4 +12,3 @@ void *list_get(const struct list *, size_t);
 void list_clear(struct list *);
 void list_free(struct list *);
 size_t list_size(const struct list *);
-

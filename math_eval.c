@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "linenoise.h"
+#include "libs/linenoise.h"
 
 int main() {
     linenoiseHistorySetMaxLen(10);

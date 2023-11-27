@@ -1,11 +1,14 @@
 #pragma once
 
-#include "list.h"
+#include "libs/list.h"
 
 enum token_type {
-    // literals
     NUMBER,
-    // add variable support later?
+    
+    // TODO: variables
+
+    // built-in math functions
+    
 
     // delimiters
     L_PAREN,

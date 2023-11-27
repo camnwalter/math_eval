@@ -63,7 +63,7 @@ static void eval_root(struct node *root) {
     }
 
     if (eval_node(root)) {
-        printf("%.2f\n", root->val);
+        printf("%.12g\n", root->val);
     }
 }
 
