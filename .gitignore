@@ -1,2 +1,4 @@
 math_eval
 valgrind-out.txt
+build
+CMakeFiles
