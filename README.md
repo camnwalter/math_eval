@@ -13,7 +13,6 @@ This was written over Thanksgiving Break 2023, so it's not the best :)
 - Parentheses
 
 ## Potential additional features, in order of how likely I am to do them...
-- Command history via up/down arrows, editing via left & right arrows
 - Variables
 - Trig functions
 
