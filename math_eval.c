@@ -1,17 +1,22 @@
 #include "eval.h"
-#include <stdbool.h>
+#include <string.h>
 #include <stdio.h>
-#include <signal.h>
-
-#define MAX_INPUT_LENGTH 256
+#include <stdlib.h>
+#include "linenoise.h"
 
 int main() {
+    linenoiseHistorySetMaxLen(10);
+
     puts("Math Evaluator");
-    char input[MAX_INPUT_LENGTH];
-    char *output = NULL;
-    while ((output = fgets(input, MAX_INPUT_LENGTH, stdin)) != NULL) {
-        puts("Input an expression to be evaluated...");
-        eval(output);
+    puts("q to exit");
+    char *input = NULL;
+    while ((input = linenoise("Input an expression to evaluate: ")) != NULL) {
+        if (strcmp("q", input) == 0) {
+            free(input);
+            break;
+        }
+        linenoiseHistoryAdd(input);
+        eval(input);
+        free(input);
     }
-    return 0;
 }

@@ -19,6 +19,6 @@ struct node {
 
 bool is_unary_op(enum token_type);
 bool is_binary_op(enum token_type);
-struct node *parse_root(const struct list *);
+bool parse_root(const struct list *, struct node **);
 void cleanup(struct node *);
 

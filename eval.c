@@ -68,10 +68,15 @@ static void eval_root(struct node *root) {
 }
 
 void eval(char *raw_input) {
-    struct list *tokens = convert_to_tokens(raw_input); // lexer
-    struct node *root = parse_root(tokens); // parser
-    eval_root(root);
+    struct list *tokens = list_init(0);
+    if (convert_to_tokens(tokens, raw_input)) { // lexer
+        struct node *root = NULL;
+        if (parse_root(tokens, &root)) { // parser
+            eval_root(root);
+        }
 
-    cleanup(root);
+        cleanup(root);
+    }
+
     list_free(tokens);
 }

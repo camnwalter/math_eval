@@ -2,4 +2,4 @@
 
 #include "list.h"
 
-struct list *convert_to_tokens(char *);
+bool convert_to_tokens(struct list *, char *);

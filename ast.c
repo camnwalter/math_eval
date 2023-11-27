@@ -2,6 +2,8 @@
 #include "ast.h"
 #include "token.h"
 
+static bool success = true;
+
 // ORDER OF OPERATIONS:
 // 1. Parentheses
 // 2. Exponents
@@ -39,6 +41,11 @@ static struct node *create_node(struct token *token) {
     return node;
 }
 
+void consume(size_t *index) {
+    (*index)++;
+}
+
+// NOLINTNEXTLINE(misc-no-recursion)
 static struct node *parse_primary(const struct list *tokens, size_t *index) {
     struct token *current = list_get(tokens, *index);
     if (current == NULL) {
@@ -47,11 +54,17 @@ static struct node *parse_primary(const struct list *tokens, size_t *index) {
 
     switch (current->type) {
         case U_MINUS: {
-            (*index)++;
+            consume(index);
             struct node *new_node = create_node(current);
             new_node->left = parse_add(tokens, index);
+            
+            
             if (new_node->left == NULL) {
-                puts("Error: - takes 1 or 2 operands, none found.");
+                if (success) {
+                    puts("Error: - takes 1 or 2 operands, none found.");
+                    success = false;
+                }
+
                 cleanup(new_node);
                 return NULL;
             }
@@ -59,24 +72,32 @@ static struct node *parse_primary(const struct list *tokens, size_t *index) {
             return new_node;
         }
         case NUMBER: {
-            (*index)++;
+            consume(index);
             struct node *new_node = create_node(current);
             new_node->node_type = LEAF;
             return new_node;
         }
         case L_PAREN: {
-            (*index)++;
+            consume(index);
             struct node *new_node = parse_add(tokens, index);
-            if (((struct token *) list_get(tokens, *index))->type != R_PAREN) {
-                puts("Expected ')'");
+            struct token *token = list_get(tokens, *index);
+            if (token->type != R_PAREN) {
+                if (success) {
+                    puts("Expected ')'");
+                    success = false;
+                }
+
                 cleanup(new_node);
                 return NULL;
             }
-            (*index)++;
+            consume(index);
             return new_node;
         }
         case R_PAREN: {
-            puts("Expected token: ')'");
+            if (success) {
+                puts("Expected token: '('");
+                success = false;
+            }
             return NULL;
         }
         default:
@@ -86,20 +107,28 @@ static struct node *parse_primary(const struct list *tokens, size_t *index) {
     return NULL;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static struct node *parse_exponent(const struct list *tokens, size_t *index) {
     struct node *left = parse_primary(tokens, index);
 
     struct token *current = list_get(tokens, *index);
     while (current != NULL && current->type == POWER) {
-        (*index)++;
+        consume(index);
         if (left == NULL) {
-            puts("Error: ^ takes 2 operands, none found.");
+            if (success) {
+                puts("Error: ^ takes 2 operands, none found.");
+                success = false;
+            }
             return NULL;
         }
 
         struct node *right = parse_exponent(tokens, index);
         if (right == NULL) {
-            puts("Error: ^ takes 2 operands, only 1 found.");
+            if (success) {
+                puts("Error: ^ takes 2 operands, only 1 found.");
+                success = false;
+            }
+
             cleanup(left);
             return NULL;
         }
@@ -116,20 +145,28 @@ static struct node *parse_exponent(const struct list *tokens, size_t *index) {
     return left;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static struct node *parse_multiply(const struct list *tokens, size_t *index) {
     struct node *left = parse_exponent(tokens, index);
 
     struct token *current = list_get(tokens, *index);
     while (current != NULL && (current->type == MULTIPLY || current->type == DIVIDE)) {
-        (*index)++;
+        consume(index);
         if (left == NULL) {
-            puts("Error: * and / take 2 operands, none found.");
+            if (success) {
+                puts("Error: * and / take 2 operands, none found.");
+                success = false;
+            }
             return NULL;
         }
 
         struct node *right = parse_exponent(tokens, index);
         if (right == NULL) {
-            puts("Error: * and / take 2 operands, only 1 found.");
+            if (success) {
+                puts("Error: * and / take 2 operands, only 1 found.");
+                success = false;
+            }
+            
             cleanup(left);
             return NULL;
         }
@@ -146,20 +183,27 @@ static struct node *parse_multiply(const struct list *tokens, size_t *index) {
     return left;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 static struct node *parse_add(const struct list *tokens, size_t *index) {
     struct node *left = parse_multiply(tokens, index);
 
     struct token *current = list_get(tokens, *index);
     while (current != NULL && (current->type == PLUS || current->type == MINUS)) {
-        (*index)++;
+        consume(index);
         if (left == NULL) {
-            puts("Error: + and - take 2 operands, none found.");
+            if (success) {
+                puts("Error: + and - take 2 operands, none found.");
+                success = false;                
+            }
             return NULL;
         }
 
         struct node *right = parse_multiply(tokens, index);
         if (right == NULL) {
-            puts("Error: + and - take 2 operands, only 1 found.");
+            if (success) {
+                puts("Error: + and - take 2 operands, only 1 found.");
+                success = false;                
+            }
             cleanup(left);
             return NULL;
         }
@@ -176,12 +220,14 @@ static struct node *parse_add(const struct list *tokens, size_t *index) {
     return left;
 }
 
-struct node *parse_root(const struct list *tokens) {
+bool parse_root(const struct list *tokens, struct node **root) {
     size_t index = 0;
-    struct node *root = parse_add(tokens, &index);
-    return root;
+    success = true;
+    *root = parse_add(tokens, &index);
+    return success;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 void cleanup(struct node *node) {
     if (node == NULL) {
         return;
